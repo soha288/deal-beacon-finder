@@ -13,9 +13,19 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with query:', query);
     if (query.trim()) {
       onSearch(query.trim());
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Input change detected:', e.target.value);
+    setQuery(e.target.value);
+  };
+
+  const handleInputFocus = () => {
+    console.log('Input focused');
   };
 
   return (
@@ -27,9 +37,12 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
             type="text"
             placeholder="Search for products (e.g., iPhone, laptop, headphones...)"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="pl-12 pr-4 py-6 text-lg border-2 transition-all duration-300 focus:shadow-lg"
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            className="pl-12 pr-4 h-14 text-lg border-2 transition-all duration-300 focus:shadow-lg focus-visible:ring-2 focus-visible:ring-primary"
             disabled={isLoading}
+            autoComplete="off"
+            autoFocus={false}
           />
         </div>
         <Button 
