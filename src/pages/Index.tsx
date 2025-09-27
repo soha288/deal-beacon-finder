@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { SearchBar } from '@/components/SearchBar';
 import { ProductCard } from '@/components/ProductCard';
+import { ApiStatus } from '@/components/ApiStatus';
 import { searchProducts, Product } from '@/data/mockProducts';
+import { searchWithFallback } from '@/services/productApi';
 import { Zap, TrendingUp, Award, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -14,21 +16,24 @@ const Index = () => {
   const { toast } = useToast();
 
   const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
     setIsLoading(true);
+    setProducts([]);
     setHasSearched(true);
     
     try {
-      const results = await searchProducts(query);
+      // Try to use real API first, fallback to mock data if unavailable
+      const results = await searchWithFallback(query);
       setProducts(results);
-      
       toast({
-        title: "Search Complete!",
-        description: `Found ${results.length} deals across Amazon and Flipkart`,
+        title: "Search completed",
+        description: `Found ${results.length} products from Amazon and Flipkart for "${query}"`,
       });
     } catch (error) {
       toast({
-        title: "Search Failed",
-        description: "Unable to fetch deals. Please try again.",
+        title: "Search failed", 
+        description: "Unable to fetch products. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -71,7 +76,8 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto space-y-4">
+              <ApiStatus />
               <SearchBar onSearch={handleSearch} isLoading={isLoading} />
             </div>
 
